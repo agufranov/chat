@@ -28,6 +28,9 @@ gulp.task "server-watch-coffee", ->
 
 gulp.task "server", ->
   supervisor "./build/server/app.js",
+    watch: "./build/server"
+    forceWatch: true
+    extensions: [ "js" ]
     debug: true
     noRestartOn: "exit"
 
