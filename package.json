@@ -1,0 +1,32 @@
+{
+  "name": "chat",
+  "version": "0.0.0",
+  "description": "chat ====",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agufranov/chat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/agufranov/chat/issues"
+  },
+  "homepage": "https://github.com/agufranov/chat",
+  "devDependencies": {
+    "coffee-script": "^1.7.1",
+    "gulp": "^3.8.6",
+    "gulp-coffee": "^2.1.1",
+    "gulp-jade": "^0.6.1",
+    "gulp-nodemon": "^1.0.4",
+    "gulp-sourcemaps": "^1.1.0",
+    "gulp-supervisor": "^0.1.2",
+    "gulp-using": "0.0.1",
+    "gulp-watch": "^0.6.8",
+    "nodemon": "^1.2.1",
+    "supervisor": "^0.6.0"
+  }
+}
