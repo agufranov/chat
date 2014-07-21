@@ -30,6 +30,10 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
         console.log "[error] #{error}"
       $rootScope.$on "socket:message", (event, message) ->
         console.log "[message] #{message}"
+      $rootScope.$on "socket:messaging error", (event, error) ->
+        console.log "[messaging error] #{error}"
+      $rootScope.$on "socket:chat message from user", ->
+        console.log "Chat message from user:", arguments
 
   $scope.disconnect = ->
     socketSvc.disconnect()

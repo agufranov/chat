@@ -1,12 +1,10 @@
 socketio = require "socket.io"
-db = require "./db"
+store = require "./store"
 
 class Server
   constructor: (port) ->
     @io = socketio port
-    @db = new db()
-
-    @db.debug_flushall()
+    @store = new store()
 
     @io.set "authorization", (data, accept) =>
       uid = data._query.uid # uid (user ID) should come with connection
@@ -19,7 +17,7 @@ class Server
       sid = socket.id
       uid = socket.handshake.query.uid
 
-      @db.saveUserId sid, uid
+      @store.storeUser uid, sid
 
       console.log "#{uid} connected"
       socket.send "Welcome, #{uid}"
@@ -31,16 +29,18 @@ class Server
       # Message to user
       socket.on "chat message to user", (to, text) =>
         console.log to, text
-        @db.getSocketIdByUserId to, (sid) =>
-          console.log sid
+        sid = @store.getSid to
+        if !sid?
+          socket.emit "messaging error", "#{to} is not connected"
+        else
           toSocket = @io.sockets.connected[sid]
           if !toSocket?
-            socket.emit "messaging error", "#{sid} is not connected"
+            socket.emit "messaging error", "#{to} is not connected"
           else
             toSocket.emit "chat message from user", uid, text
 
       socket.on "disconnect", (socket) =>
-        @db.deleteUserId sid, uid
+        @store.removeUser uid
         console.log "#{uid} disconnected"
         @io.sockets.send "#{uid} disconnected"
 
