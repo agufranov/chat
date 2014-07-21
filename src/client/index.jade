@@ -1,9 +1,11 @@
-html(ng-app="")
+html(ng-app="app")
   head
     script(type="text/javascript", src="lib/socket.io-client/socket.io.js")
     script(type="text/javascript", src="lib/angular/angular.js")
+    script(type="text/javascript", src="lib/angular-socket-io/socket.js")
     script(type="text/javascript", src="lib/jquery/dist/jquery.js")
     script(type="text/javascript", src="app.js")
+    script(type="text/javascript", src="services/SocketSvc.js")
     script(type="text/javascript", src="controllers/MyCtrl.js")
   body(ng-controller="MyCtrl")
     form#messaging

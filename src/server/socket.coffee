@@ -9,15 +9,15 @@ class Server
     @db.debug_flushall()
 
     @io.set "authorization", (data, accept) =>
-      userId = data._query.userId #userId should come with connection
-      if !userId?
-        accept "userId is missing", false
+      uid = data._query.uid # uid (user ID) should come with connection
+      if !uid?
+        accept "uid is missing", false
       else
         accept null, true
 
     @io.on "connection", (socket) =>
       sid = socket.id
-      uid = socket.handshake.query.userId
+      uid = socket.handshake.query.uid
 
       @db.saveUserId sid, uid
 

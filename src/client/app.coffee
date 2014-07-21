@@ -1,3 +1,7 @@
+window.App = angular.module "app", [
+  "btford.socket-io"
+]
+
 #userId = document.location.hash[1..]
 
 #window.socket = io.connect "http://127.0.0.1:8001",
