@@ -26,7 +26,16 @@ gulp.task "server-watch-coffee", ->
     .pipe sourcemaps.write()
     .pipe gulp.dest "./build/server/"
 
-gulp.task "server", ->
+gulp.task "server", [ "nodemon" ]
+
+gulp.task "nodemon", ->
+  nodemon
+    script: "./build/server/app.js"
+    ignore: [ "client/**" ]
+    ext: "js"
+    nodeArgs: [ "--debug" ]
+
+gulp.task "supervisor", ->
   supervisor "./build/server/app.js",
     watch: "./build/server"
     forceWatch: true
