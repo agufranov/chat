@@ -1,5 +1,6 @@
 window.App = angular.module "app", [
   "btford.socket-io"
+  "angular.filter"
 ]
 
 #userId = document.location.hash[1..]

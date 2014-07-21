@@ -29,7 +29,7 @@ class Server
         console.log "Message from #{uid}: #{msg}"
 
       # Message to user
-      socket.on "message to user", (to, text) =>
+      socket.on "chat message to user", (to, text) =>
         console.log to, text
         @db.getSocketIdByUserId to, (sid) =>
           console.log sid
@@ -37,7 +37,7 @@ class Server
           if !toSocket?
             socket.emit "messaging error", "#{sid} is not connected"
           else
-            toSocket.emit "message from user", uid, text
+            toSocket.emit "chat message from user", uid, text
 
       socket.on "disconnect", (socket) =>
         @db.deleteUserId sid, uid

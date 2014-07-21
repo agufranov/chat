@@ -6,14 +6,15 @@ gulp_require = (name) ->
 [gulp_require name for name in [
   "watch"
   "coffee"
+  "jade"
   "sourcemaps"
   "using"
   "nodemon"
   "supervisor"
-  "jade"
+  "connect"
 ]]
 
-gulp.task "default", [ "server-watch", "server", "client-watch" ]
+gulp.task "default", [ "server-watch", "server", "client-watch", "client-connect" ]
 
 # Server tasks
 gulp.task "server-watch", [ "server-watch-coffee" ]
@@ -27,6 +28,11 @@ gulp.task "server-watch-coffee", ->
     .pipe gulp.dest "./build/server/"
 
 gulp.task "server", [ "nodemon" ]
+
+gulp.task "client-connect", ->
+  connect.server
+    root: "./build/client/"
+    port: 8002
 
 gulp.task "nodemon", ->
   nodemon

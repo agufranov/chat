@@ -3,16 +3,20 @@ html(ng-app="app")
     script(type="text/javascript", src="lib/socket.io-client/socket.io.js")
     script(type="text/javascript", src="lib/angular/angular.js")
     script(type="text/javascript", src="lib/angular-socket-io/socket.js")
+    script(type="text/javascript", src="lib/angular-filter/dist/angular-filter.js")
     script(type="text/javascript", src="lib/jquery/dist/jquery.js")
     script(type="text/javascript", src="app.js")
     script(type="text/javascript", src="services/SocketSvc.js")
-    script(type="text/javascript", src="controllers/MyCtrl.js")
-  body(ng-controller="MyCtrl")
-    form#messaging
-      input(type="text" name="to")
-      input(type="text" name="text")
-      button(type="submit") Send
-    input(type="text" ng-model="uid")
+    script(type="text/javascript", src="controllers/SocketCtrl.js")
+    script(type="text/javascript", src="controllers/ChatCtrl.js")
+    script(type="text/javascript", src="controllers/ChatFormCtrl.js")
+    script(type="text/javascript", src="directives/ChatDir.js")
+  body(ng-controller="socketCtrl")
+    input(type="text" ng-model="uid" ng-readonly="isConnected")
     button(ng-click="connect()" ng-show="!isConnected") Connect
     button(ng-click="disconnect()" ng-show="isConnected") Disconnect
     div(ng-bind="status")
+    button(ng-click="addChat(1)") Add chat
+    ul
+      li(ng-repeat="chat in chats | unique: 'uid'")
+        div(chat-dir="" ng-controller="chatCtrl")
