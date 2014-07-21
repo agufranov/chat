@@ -39,7 +39,7 @@ gulp.task "nodemon", ->
     script: "./build/server/app.js"
     ignore: [ "client/**" ]
     ext: "js"
-    nodeArgs: [ "--debug", "--prof" ]
+    nodeArgs: [ "--debug" ]
 
 gulp.task "supervisor", ->
   supervisor "./build/server/app.js",
