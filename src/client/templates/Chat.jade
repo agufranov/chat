@@ -2,3 +2,6 @@ form(ng-controller="chatFormCtrl")
   div Chat with {{chat.uid}}:
   input(type="text" ng-model="text")
   button(ng-click="submit()") Send
+  ul
+    li(ng-repeat="message in chat.messages")
+      {{message.text}}

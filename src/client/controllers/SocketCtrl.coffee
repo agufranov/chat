@@ -23,37 +23,57 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
     $scope.socket = socketSvc.connect($scope.uid)
     if !$rootScope._socketHandled # Если обработчики еще не повешены
       $rootScope._socketHandled = true
+
       $rootScope.$on "socket:connect", (event) ->
         console.log "connected"
         $scope._setConnected true, true
+
       $rootScope.$on "socket:disconnect", (event) ->
         console.log "disconnected"
         $scope._setConnected false, false
+
       $rootScope.$on "socket:error", (event, error) ->
         console.log "[error] #{error}"
+
       $rootScope.$on "socket:message", (event, message) ->
         console.log "[message] #{message}"
+
       $rootScope.$on "socket:messaging error", (event, error) ->
         console.log "[messaging error] #{error}"
+
       $rootScope.$on "socket:chat message from user", (event, message) ->
         console.log "Chat message from user:", message
+        chat = $scope.chats[message.from]
+        if !chat?
+          $scope.addChat message.from, [
+            {
+              direction: "to"
+              text: message.text
+              time: new Date().getTime()
+            }
+          ]
+        else
+          chat.messages.push { direction: "to", text: message.text, time: new Date().getTime() }
+
       $rootScope.$on "socket:users online", (event, users) ->
         $scope.recentUsers[uid] = true for uid in users when uid isnt $scope.uid
+
       $rootScope.$on "socket:users offline", (event, users) ->
         $scope.recentUsers[uid] = false for uid in users when uid isnt $scope.uid
 
   $scope.disconnect = ->
     socketSvc.disconnect()
 
-  $scope.chats = []
+  $scope.chats = {}
 
   $scope.recentUsers = {}
 
   $scope.sendMessage = (to, text) ->
     $scope.socket.emit "chat message to user", to, text
 
-  $scope.addChat = (uid) ->
+  $scope.addChat = (uid, messages = []) ->
     uid ?= prompt "User ID to chat with:"
     if uid?
-      $scope.chats.push
+      $scope.chats[uid] =
         uid: uid
+        messages: messages
