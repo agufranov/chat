@@ -12,7 +12,10 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
   $scope._setConnected = (isConnected, apply) ->
     $scope.status = if isConnected then "Connected" else "Disconnected"
     $scope.isConnected = isConnected
-    #if !$scope.$$phase
+
+    if !isConnected
+      $scope.recentUsers = {}
+
     if apply
       $scope.$apply()
 
@@ -32,19 +35,25 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
         console.log "[message] #{message}"
       $rootScope.$on "socket:messaging error", (event, error) ->
         console.log "[messaging error] #{error}"
-      $rootScope.$on "socket:chat message from user", ->
-        console.log "Chat message from user:", arguments
+      $rootScope.$on "socket:chat message from user", (event, message) ->
+        console.log "Chat message from user:", message
+      $rootScope.$on "socket:users online", (event, users) ->
+        $scope.recentUsers[uid] = true for uid in users when uid isnt $scope.uid
+      $rootScope.$on "socket:users offline", (event, users) ->
+        $scope.recentUsers[uid] = false for uid in users when uid isnt $scope.uid
 
   $scope.disconnect = ->
     socketSvc.disconnect()
 
   $scope.chats = []
 
+  $scope.recentUsers = {}
+
   $scope.sendMessage = (to, text) ->
     $scope.socket.emit "chat message to user", to, text
 
-  $scope.addChat = (name) ->
-    uid = prompt "User ID to chat with:"
+  $scope.addChat = (uid) ->
+    uid ?= prompt "User ID to chat with:"
     if uid?
       $scope.chats.push
         uid: uid

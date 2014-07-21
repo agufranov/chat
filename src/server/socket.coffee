@@ -20,13 +20,16 @@ class Server
       @store.storeUser uid, sid
 
       console.log "#{uid} connected"
-      socket.send "Welcome, #{uid}"
-      socket.broadcast.send "#{uid} connected"
+
+      # Send online users list to socket. Development purpose
+      socket.emit "users online", @store.onlineUsers()
+
+      socket.broadcast.emit "users online", [ uid ]
 
       socket.on "message", (msg) =>
         console.log "Message from #{uid}: #{msg}"
 
-      # Message to user
+      # Sending message to user
       socket.on "chat message to user", (to, text) =>
         console.log to, text
         sid = @store.getSid to
@@ -37,11 +40,11 @@ class Server
           if !toSocket?
             socket.emit "messaging error", "#{to} is not connected"
           else
-            toSocket.emit "chat message from user", uid, text
+            toSocket.emit "chat message from user", { from: uid, text: text }
 
       socket.on "disconnect", (socket) =>
         @store.removeUser uid
         console.log "#{uid} disconnected"
-        @io.sockets.send "#{uid} disconnected"
+        @io.emit "users offline", [ uid ]
 
 module.exports.Server = Server

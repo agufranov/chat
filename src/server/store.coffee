@@ -11,4 +11,7 @@ class Store
     @removeUser = (uid) ->
       delete @uidToSid[uid]
 
+    @onlineUsers = ->
+      Object.keys @uidToSid
+
 module.exports = Store

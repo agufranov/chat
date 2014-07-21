@@ -13,6 +13,8 @@ App.factory "socketSvc", ($rootScope, socketFactory) ->
       "error"
       "messaging error"
       "chat message from user"
+      "users online"
+      "users offline"
     ]
     mySocket
   disconnect: ->

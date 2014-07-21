@@ -16,7 +16,13 @@ html(ng-app="app")
     button(ng-click="connect()" ng-show="!isConnected") Connect
     button(ng-click="disconnect()" ng-show="isConnected") Disconnect
     div(ng-bind="status")
-    button(ng-click="addChat(1)") Add chat
+
+    ul
+      li(ng-repeat="(uid, online) in recentUsers")
+        a(href="#" ng-click="addChat(uid)") {{uid}}
+        span(ng-show="online") Online
+
+    button(ng-click="addChat()") Add chat
     ul
       li(ng-repeat="chat in chats | unique: 'uid'")
         div(chat-dir="" ng-controller="chatCtrl")
