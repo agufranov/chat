@@ -3,3 +3,4 @@ App.controller "chatFormCtrl", ($scope) ->
 
   $scope.submit = ->
     $scope.sendMessage($scope.text)
+    $scope.text = ""

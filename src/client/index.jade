@@ -2,30 +2,41 @@ html(ng-app="app")
   head
     link(rel="stylesheet", href="lib/bootstrap/dist/css/bootstrap.css")
     link(rel="stylesheet", href="lib/bootstrap/dist/css/bootstrap-theme.css")
+    link(rel="stylesheet", href="stylesheets/style.css")
     script(type="text/javascript", src="lib/socket.io-client/socket.io.js")
     script(type="text/javascript", src="lib/angular/angular.js")
     script(type="text/javascript", src="lib/angular-socket-io/socket.js")
     script(type="text/javascript", src="lib/angular-filter/dist/angular-filter.js")
     script(type="text/javascript", src="lib/jquery/dist/jquery.js")
     script(type="text/javascript", src="lib/bootstrap/dist/js/bootstrap.js")
+    script(type="text/javascript", src="lib/angular-bootstrap/ui-bootstrap-tpls.js")
+    script(type="text/javascript", src="lib/angularjs-scroll-glue/src/scrollglue.js")
     script(type="text/javascript", src="app.js")
     script(type="text/javascript", src="services/SocketSvc.js")
     script(type="text/javascript", src="controllers/SocketCtrl.js")
     script(type="text/javascript", src="controllers/ChatCtrl.js")
     script(type="text/javascript", src="controllers/ChatFormCtrl.js")
-    script(type="text/javascript", src="directives/ChatDir.js")
+    script(type="text/javascript", src="directives/Chat.js")
+    script(type="text/javascript", src="directives/RecentUsers.js")
+    script(type="text/javascript", src="directives/BootstrapDirectives.js")
   body(ng-controller="socketCtrl")
-    input(type="text" ng-model="uid" ng-readonly="isConnected")
-    button(ng-click="connect()" ng-show="!isConnected") Connect
-    button(ng-click="disconnect()" ng-show="isConnected") Disconnect
-    div(ng-bind="status")
+    nav.navbar.navbar-default
+      span.navbar-brand(ng-model="$parent.uid") {{$parent.uid}}
+      form.navbar-form.navbar-left
+        div.form-group
+          input.form-control(type="text" ng-model="$parent.uid" ng-readonly="isConnected")
+        button.btn.btn-default(ng-click="connect()" ng-show="!isConnected" ng-disabled="isConnected" id="btn-connect") Connect
+        button.btn.btn-default(ng-click="disconnect()" ng-show="isConnected" ng-disabled="!isConnected" id="btn-disconnect") Disconnect
+      div.navbar-text(ng-bind="status")
+
+    div.row
+      div.col-md-8
+        panel(heading="Chats")
+          tabset
+            tab(heading="{{chat.uid}}" ng-repeat="(uid, chat) in chats | unique: 'uid'")
+              chat(ng-controller="chatCtrl")
+      div.col-md-4
+        recent-users
 
     ul
-      li(ng-repeat="(uid, online) in recentUsers")
-        a(href="#" ng-click="addChat(uid)") {{uid}}
-        span(ng-show="online") Online
-
-    button(ng-click="addChat()") Add chat
-    ul
-      li(ng-repeat="(uid, chat) in chats | unique: 'uid'")
-        div(chat-dir="" ng-controller="chatCtrl")
+      li(ng-repeat="msg in pendingMessages") {{msg.id}}

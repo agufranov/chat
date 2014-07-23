@@ -13,6 +13,9 @@ App.factory "socketSvc", ($rootScope, socketFactory) ->
       "error"
       "messaging error"
       "chat message from user"
+      "chat message receipt to user"
+      "chat user start typing"
+      "chat user stop typing"
       "users online"
       "users offline"
     ]

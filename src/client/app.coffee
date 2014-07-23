@@ -1,7 +1,15 @@
 window.App = angular.module "app", [
   "btford.socket-io"
   "angular.filter"
+  "ui.bootstrap"
+  "luegg.directives"
 ]
+
+$(document).on "keypress", (event) ->
+  return if event.target.tagName in [ "INPUT", "TEXTAREA" ]
+  switch event.keyCode
+    when 49 then $("#btn-connect").click()
+    when 50 then $("#btn-disconnect").click()
 
 #userId = document.location.hash[1..]
 

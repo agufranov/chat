@@ -1,9 +1,23 @@
 App.controller "chatCtrl", ($rootScope, $scope) ->
-  $scope.sendMessage = (text) ->
-    to = $scope.$parent.chat.uid
-    $scope.$parent.sendMessage to, text
-    console.log "sendMessage to: #{to} text: #{text}"
-    $scope.chat.messages.push { direction: "from", text: text, time: new Date().getTime() }
+  $scope.sendMessageReceipt = (msg) ->
+    return if msg.direction == "out"
+    $scope.chat.messages[msg.id].received = true
+    $scope.$parent.sendMessageReceipt msg
 
-  #$rootScope.$on "socket:chat message from user", (event, message) ->
-    #$scope.chat.messages.push { direction: "to", text: message.text, time: new Date().getTime() }
+  $scope.sendMessage = (text) ->
+    msg =
+      direction: "out"
+      text: text
+      from: $rootScope.uid
+      to: $scope.$parent.chat.uid
+      id: btoa(Math.random())
+      received: false
+    $scope.$parent.sendMessage msg
+    $scope.chat.messages[msg.id] = msg
+
+  $scope.sendStartTyping = ->
+    console.log "start typing"
+    $scope.$parent.sendStartTyping $scope.$parent.chat.uid
+
+  $scope.sendStopTyping = ->
+    $scope.$parent.sendStopTyping $scope.$parent.chat.uid

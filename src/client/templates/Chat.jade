@@ -1,7 +1,12 @@
+ul.chat.list-group(scroll-glue="")
+  li.chat-message.list-group-item(ng-repeat="(id, message) in chat.messages" ng-mouseover="sendMessageReceipt(this.message)" ng-class="{\"pending\": !message.received}")
+    ng-switch(on="message.direction")
+      span(ng-switch-when="in" class="chat-message-in") <<< {{message.from}}:
+      span(ng-switch-when="out" class="chat-message-out") >>> [you]:
+      span &nbsp;
+      span {{message.text}}
 form(ng-controller="chatFormCtrl")
-  div Chat with {{chat.uid}}:
-  input(type="text" ng-model="text")
+  input(type="text" ng-model="text" ng-keydown="sendStartTyping()" ng-keyup="sendStopTyping()")
   button(ng-click="submit()") Send
-  ul
-    li(ng-repeat="message in chat.messages")
-      {{message.text}}
+  div(ng-if="chat.typing")
+    b Typing...

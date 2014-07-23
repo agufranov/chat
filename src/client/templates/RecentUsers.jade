@@ -1,0 +1,6 @@
+div.panel.panel-default
+  div.panel-heading Recent users
+  div.panel-body
+    button.btn.btn-default(ng-click="addChat()") Add chat
+    div.list-group
+      a.list-group-item(href="#" ng-repeat="(uid, online) in recentUsers" ng-click="addChat(uid)" ng-class="{ \"list-group-item-success\": !!online, \"list-group-item-danger\": !online }") {{uid}}
