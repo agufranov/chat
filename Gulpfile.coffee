@@ -6,15 +6,17 @@ gulp_require = (name) ->
 [gulp_require name for name in [
   "watch"
   "coffee"
+  "coffeelint"
   "jade"
   "sourcemaps"
   "using"
   "nodemon"
   "supervisor"
-  "connect"
+  "webserver"
+  "livereload"
 ]]
 
-gulp.task "default", [ "server-watch", "server", "client-watch", "client-connect" ]
+gulp.task "default", [ "server-watch", "server", "client-watch", "client-webserver", "livereload" ]
 
 # Server tasks
 gulp.task "server-watch", [ "server-watch-coffee" ]
@@ -27,12 +29,29 @@ gulp.task "server-watch-coffee", ->
     .pipe sourcemaps.write()
     .pipe gulp.dest "./build/server/"
 
+gulp.task "coffeelint", ->
+  gulp.src "./src/**/*.coffee"
+    .pipe coffeelint()
+    .pipe coffeelint.reporter()
+
 gulp.task "server", [ "nodemon" ]
+
+gulp.task "client-webserver", ->
+  gulp.src "./build/client/"
+    .pipe webserver
+      livereload: true
+      directoryListing: false
+      port: 8002
 
 gulp.task "client-connect", ->
   connect.server
     root: "./build/client/"
     port: 8002
+    livereload: false
+
+gulp.task "livereload", ->
+  watch glob: "./build/client/**/*.js", ->
+    #console.log arguments
 
 gulp.task "nodemon", ->
   nodemon
@@ -43,7 +62,7 @@ gulp.task "nodemon", ->
 
 gulp.task "supervisor", ->
   supervisor "./build/server/app.js",
-    watch: "./build/server"
+    watch: "./build/server/"
     forceWatch: true
     extensions: [ "js" ]
     debug: true
@@ -65,3 +84,4 @@ gulp.task "client-watch-jade", ->
     .pipe using({ prefix: "Compiling Jade:", color: "red" })
     .pipe jade()
     .pipe gulp.dest "./build/client/"
+    #.pipe livereload()
