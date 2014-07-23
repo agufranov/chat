@@ -37,7 +37,7 @@ gulp.task "coffeelint", ->
 gulp.task "server", [ "nodemon" ]
 
 gulp.task "client-webserver", ->
-  gulp.src "./build/client/"
+  gulp.src "./build/client/**"
     .pipe webserver
       livereload: true
       directoryListing: false
