@@ -8,6 +8,7 @@ gulp_require = (name) ->
   "coffee"
   "coffeelint"
   "jade"
+  "less"
   "sourcemaps"
   "using"
   "nodemon"
@@ -16,7 +17,7 @@ gulp_require = (name) ->
   "livereload"
 ]]
 
-gulp.task "default", [ "server-watch", "server", "client-watch", "client-webserver", "livereload" ]
+gulp.task "default", [ "server", "server-watch", "client-watch", "client-webserver", "livereload" ]
 
 # Server tasks
 gulp.task "server-watch", [ "server-watch-coffee" ]
@@ -69,7 +70,7 @@ gulp.task "supervisor", ->
     noRestartOn: "exit"
 
 # Client tasks
-gulp.task "client-watch", [ "client-watch-coffee", "client-watch-jade" ]
+gulp.task "client-watch", [ "client-watch-coffee", "client-watch-jade", "client-watch-less" ]
 
 gulp.task "client-watch-coffee", ->
   watch glob: "./src/client/**/*.coffee"
@@ -84,4 +85,9 @@ gulp.task "client-watch-jade", ->
     .pipe using({ prefix: "Compiling Jade:", color: "red" })
     .pipe jade()
     .pipe gulp.dest "./build/client/"
-    #.pipe livereload()
+
+gulp.task "client-watch-less", ->
+  watch glob: "./src/client/**/*.less"
+    .pipe using({ prefix: "Compiling Sass:", color: "red" })
+    .pipe less()
+    .pipe gulp.dest "./build/client/"
