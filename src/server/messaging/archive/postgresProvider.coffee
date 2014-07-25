@@ -5,10 +5,14 @@ settings = require "../../settings"
 # Слой базы данных для архивирования сообщений
 class PostgresProvider
   constructor: ->
+    #client = null
     client = new pg.Client settings.db.connectionString
     client.connect (err) ->
       if err
         console.log "PostgresProvider error: #{err}"
+    #pg.connect settings.db.connectionString, (err, _client, done) ->
+      #client = _client
+      
 
     @archiveMessage = (msg, callback) ->
       client.query "INSERT INTO messages (local_id, body, \"from\", \"to\", timestamp, read) VALUES ($1, $2, $3, $4, $5, $6)", [ msg.id, msg.body, msg.from, msg.to, msg.timestamp, false ], callback

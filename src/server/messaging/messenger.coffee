@@ -15,6 +15,7 @@ class Messenger
         pm = new Perfmeter()
         msg.from = thisUid
         msg.timestamp = new Date().getTime()
+        pm.restart "start:"
         archiveProvider.archiveMessage msg, (err, result) ->
           if err?
             console.log err
@@ -34,7 +35,7 @@ class Messenger
             body: msg.body
             id: msg.id
             timestamp: msg.timestamp
-          pm.stop()
+          pm.restart "db"
 
       # Отправка подтверждения прочтения
       socket.on "chat receipt", (msg) ->
