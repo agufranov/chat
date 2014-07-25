@@ -1,4 +1,8 @@
 html
-  frameset(cols="50%,*")
-    frame(src="/index.html?Alpha")
-    frame(src="/index.html?Bravo")
+  frameset(rows="50%,*")
+    frameset(cols="50%,*")
+      frame(src="/index.html?Alpha")
+      frame(src="/index.html?Bravo")
+    frameset(cols="50%,*")
+      frame(src="/index.html?Charlie")
+      frame(src="/index.html?Alpha")

@@ -1,17 +1,16 @@
 class Store
-  constructor: ->
-    @uidToSid = {}
+  @uidToSid: {}
 
-    @storeUser = (uid, sid) ->
-      @uidToSid[uid] = sid
+  @storeUser: (uid, sid) ->
+    @uidToSid[uid] = sid
 
-    @getSid = (uid) ->
-      @uidToSid[uid]
+  @getSid: (uid) ->
+    @uidToSid[uid]
 
-    @removeUser = (uid) ->
-      delete @uidToSid[uid]
+  @removeUser: (uid) ->
+    delete @uidToSid[uid]
 
-    @onlineUsers = ->
-      Object.keys @uidToSid
+  @onlineUsers: ->
+    Object.keys @uidToSid
 
 module.exports = Store

@@ -19,6 +19,7 @@ html(ng-app="app")
     script(type="text/javascript", src="directives/Chat.js")
     script(type="text/javascript", src="directives/RecentUsers.js")
     script(type="text/javascript", src="directives/BootstrapDirectives.js")
+    script(type="text/javascript", src="filters/OrderObjectBy.js")
   body(ng-controller="socketCtrl")
     nav.navbar.navbar-default
       span.navbar-brand(ng-model="$parent.uid") {{$parent.uid}}

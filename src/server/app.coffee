@@ -1,4 +1,4 @@
-socket = require "./socket"
+settings = require "./settings"
+SocketServer = require "./socket/server"
 
-console.log socket
-socketServer = new socket.Server 8001
+socketServer = new SocketServer settings.port

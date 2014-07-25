@@ -21,9 +21,6 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
 
   $scope.pendingMessages = {}
 
-  $scope.$watch "pendingMessages", ->
-    console.log "pendingMessages changed", arguments
-
   $scope.connect = ->
     $scope.socket = socketSvc.connect($rootScope.uid)
     if !$rootScope._socketHandled # Если обработчики еще не повешены
@@ -46,16 +43,17 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
       $rootScope.$on "socket:messaging error", (event, error) ->
         console.log "[messaging error] #{error}"
 
-      $rootScope.$on "socket:chat message from user", (event, message) ->
+      $rootScope.$on "socket:chat", (event, message) ->
         console.log "Chat message from user:", message
         chat = $scope.chats[message.from]
         msg =
           direction: "in"
-          text: message.text
+          body: message.body
           from: message.from
           to: $rootScope.uid
           id: message.id
-          received: false
+          read: false
+          timestamp: message.timestamp
         if !chat?
           messages = {}
           messages[msg.id] = msg
@@ -63,17 +61,36 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
         else
           chat.messages[msg.id] = msg
 
-      $rootScope.$on "socket:chat message receipt to user", (event, msg) ->
-        $scope.chats[msg.from].messages[msg.id].received = true
+      $rootScope.$on "socket:my chat", (event, message) ->
+        console.log "My chat", message
+        chat = $scope.chats[message.to]
+        msg =
+          direction: "out"
+          body: message.body
+          from: $rootScope.uid
+          to: message.to
+          id: message.id
+          read: false
+          timestamp: message.timestamp
+        if !chat?
+          messages = {}
+          messages[msg.id] = msg
+          $scope.addChat message.to, messages
+        else
+          chat.messages[msg.id] = msg
+
+      $rootScope.$on "socket:chat timestamp", (event, message) ->
+        chat = $scope.chats[message.to]
+        chat.messages[message.id].timestamp = message.timestamp
+
+      $rootScope.$on "socket:chat receipt", (event, msg) ->
+        if(chat = $scope.chats[msg.from])
+          chat.messages[msg.id].read = true
         delete $scope.pendingMessages[msg.id]
 
-      $rootScope.$on "socket:chat user start typing", (event, uid) ->
-        chat = $scope.chats[uid]
-        chat.typing = true if chat
-
-      $rootScope.$on "socket:chat user stop typing", (event, uid) ->
-        chat = $scope.chats[uid]
-        chat.typing = false if chat
+      $rootScope.$on "socket:chat typing", (event, chat) ->
+        chatWith = $scope.chats[chat.uid]
+        chatWith.typing = chat.typing if chatWith
 
       $rootScope.$on "socket:users online", (event, users) ->
         $scope.recentUsers[uid] = true for uid in users when uid isnt $rootScope.uid
@@ -89,20 +106,19 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
   $scope.recentUsers = {}
 
   $scope.sendMessage = (msg) ->
-    $scope.socket.emit "chat message to user", msg
+    $scope.socket.emit "chat", msg
     $scope.pendingMessages[msg.id] =
       id: msg.id
 
   $scope.sendMessageReceipt = (msg) ->
-    $scope.socket.emit "chat message receipt to user",
+    $scope.socket.emit "chat receipt",
       id: msg.id
       to: msg.from
 
-  $scope.sendStartTyping = (uid) ->
-    $scope.socket.emit "chat user start typing", uid
-
-  $scope.sendStopTyping = (uid) ->
-    $scope.socket.emit "chat user stop typing", uid
+  $scope.sendTyping = (uid, typing) ->
+    $scope.socket.emit "chat typing",
+      uid: uid
+      typing: typing
 
   $scope.addChat = (uid, messages = {}) ->
     uid ?= prompt "User ID to chat with:"
@@ -111,5 +127,28 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
         uid: uid
         messages: messages
         typing: false
+
+    $scope.getHistory = (uid, limit, offset) ->
+      rid = btoa(Math.random())
+      removeHandler = $rootScope.$on "socket:get history", (event, history) ->
+        if history.rid == rid
+          removeHandler()
+          if (chat = $scope.chats[uid])
+            (
+              chat.messages[msg.local_id] =
+                body: msg.body
+                from: msg.from
+                to: msg.to
+                read: msg.read
+                timestamp: msg.timestamp
+                id: msg.local_id
+                direction: msg.direction
+            ) for msg in history.messages
+
+      $scope.socket.emit "get history",
+        rid: rid
+        with: uid
+        offset: offset
+        limit: limit
 
   $scope.connect()

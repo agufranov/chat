@@ -1,9 +1,11 @@
 class Perfmeter
   constructor: ->
-    @t1 = process.hrtime()
+    @mt1 = process.hrtime()
+    @t1 = new Date().getTime()
 
     @stop = ->
-      @t2 = process.hrtime(@t1)
-      console.log @t2
+      @mt2 = process.hrtime(@mt1)
+      @t2 = new Date().getTime()
+      console.log "#{@mt2} (#{@t2 - @t1} ms)"
 
 module.exports = Perfmeter

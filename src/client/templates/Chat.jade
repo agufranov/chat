@@ -1,12 +1,15 @@
 ul.chat.list-group(scroll-glue="")
-  li.chat-message.list-group-item(ng-repeat="(id, message) in chat.messages" ng-mouseover="sendMessageReceipt(this.message)" ng-class="{\"pending\": !message.received}")
+  li.chat-message.list-group-item(ng-repeat="message in chat.messages | orderObjectBy:\"timestamp\"" ng-mouseover="sendMessageReceipt(this.message)" ng-class="{\"pending\": !message.read}")
     ng-switch(on="message.direction")
       span(ng-switch-when="in" class="chat-message-in") <<< {{message.from}}:
       span(ng-switch-when="out" class="chat-message-out") >>> [you]:
       span &nbsp;
-      span {{message.text}}
+      span [{{message.timestamp | date: 'dd.MM.yyyy HH:mm:ss Z'}}]
+      span &nbsp;
+      span {{message.body}}
+  li.chat-message.list-group-item(ng-if="chat.typing")
+    i {{chat.uid}} is typing...
 form(ng-controller="chatFormCtrl")
-  input(type="text" ng-model="text" ng-keydown="sendStartTyping()" ng-keyup="sendStopTyping()")
+  input(type="text" ng-model="text" ng-keydown="sendTyping(true)" ng-keyup="sendTyping(false)")
   button(ng-click="submit()") Send
-  div(ng-if="chat.typing")
-    b Typing...
+button(ng-click="getHistory(chat.uid)") Get history

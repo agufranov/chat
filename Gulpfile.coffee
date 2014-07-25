@@ -22,6 +22,8 @@ gulp.task "default", [ "server", "server-watch", "client-watch", "client-webserv
 # Server tasks
 gulp.task "server-watch", [ "server-watch-coffee" ]
 
+gulp.task "server-only", [ "server", "server-watch" ]
+
 gulp.task "server-watch-coffee", ->
   watch glob: "./src/server/**/*.coffee"
     .pipe using({ prefix: "Compiling server CoffeeScript", color: "red" })
@@ -36,6 +38,29 @@ gulp.task "coffeelint", ->
     .pipe coffeelint.reporter()
 
 gulp.task "server", [ "nodemon" ]
+
+# Client tasks
+gulp.task "client-watch", [ "client-watch-coffee", "client-watch-jade", "client-watch-less" ]
+
+gulp.task "client-watch-coffee", ->
+  watch glob: "./src/client/**/*.coffee"
+    .pipe using({ prefix: "Compiling client CoffeeScript:", color: "red" })
+    .pipe sourcemaps.init()
+    .pipe coffee()
+    .pipe sourcemaps.write()
+    .pipe gulp.dest "./build/client/"
+
+gulp.task "client-watch-jade", ->
+  watch glob: "./src/client/**/*.jade"
+    .pipe using({ prefix: "Compiling Jade:", color: "red" })
+    .pipe jade()
+    .pipe gulp.dest "./build/client/"
+
+gulp.task "client-watch-less", ->
+  watch glob: "./src/client/**/*.less"
+    .pipe using({ prefix: "Compiling Sass:", color: "red" })
+    .pipe less()
+    .pipe gulp.dest "./build/client/"
 
 gulp.task "client-webserver", ->
   gulp.src "./build/client/**"
@@ -68,26 +93,3 @@ gulp.task "supervisor", ->
     extensions: [ "js" ]
     debug: true
     noRestartOn: "exit"
-
-# Client tasks
-gulp.task "client-watch", [ "client-watch-coffee", "client-watch-jade", "client-watch-less" ]
-
-gulp.task "client-watch-coffee", ->
-  watch glob: "./src/client/**/*.coffee"
-    .pipe using({ prefix: "Compiling client CoffeeScript:", color: "red" })
-    .pipe sourcemaps.init()
-    .pipe coffee()
-    .pipe sourcemaps.write()
-    .pipe gulp.dest "./build/client/"
-
-gulp.task "client-watch-jade", ->
-  watch glob: "./src/client/**/*.jade"
-    .pipe using({ prefix: "Compiling Jade:", color: "red" })
-    .pipe jade()
-    .pipe gulp.dest "./build/client/"
-
-gulp.task "client-watch-less", ->
-  watch glob: "./src/client/**/*.less"
-    .pipe using({ prefix: "Compiling Sass:", color: "red" })
-    .pipe less()
-    .pipe gulp.dest "./build/client/"
