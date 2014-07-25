@@ -61,6 +61,19 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
         else
           chat.messages[msg.id] = msg
 
+      $rootScope.$on "socket:room chat", (event, message) ->
+        msg =
+          direction: "in"
+          body: message.body
+          from: message.from
+          to: message.to
+          id: message.id
+          read: false
+          timestamp: message.timestamp
+        if (roomChat = $scope.roomChats[message.to])?
+          roomChat.messages[msg.id] = msg
+          console.log "room chat: #{msg.body}", roomChat
+
       $rootScope.$on "socket:my chat", (event, message) ->
         console.log "My chat", message
         chat = $scope.chats[message.to]
@@ -85,12 +98,24 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
 
       $rootScope.$on "socket:chat receipt", (event, msg) ->
         if(chat = $scope.chats[msg.from])
-          chat.messages[msg.id].read = true
+          if(message = chat.messages[msg.id])
+            message.read = true
         delete $scope.pendingMessages[msg.id]
 
       $rootScope.$on "socket:chat typing", (event, chat) ->
         chatWith = $scope.chats[chat.uid]
         chatWith.typing = chat.typing if chatWith
+
+      $rootScope.$on "socket:join room", (event, data) ->
+        console.log "#{data.uid} joined room #{data.room}"
+
+      $rootScope.$on "socket:room joined", (event, options) ->
+        $scope.roomChats[options.name] =
+          name: options.name
+          messages: {}
+        console.log "You have successfully joined the room #{options.name}"
+
+      # room chat
 
       $rootScope.$on "socket:users online", (event, users) ->
         $scope.recentUsers[uid] = true for uid in users when uid isnt $rootScope.uid
@@ -98,10 +123,14 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
       $rootScope.$on "socket:users offline", (event, users) ->
         $scope.recentUsers[uid] = false for uid in users when uid isnt $rootScope.uid
 
+      $rootScope.$on "socket:debug", (event, t) ->
+        console.log "DEBUG:", t
+
   $scope.disconnect = ->
     socketSvc.disconnect()
 
   $scope.chats = {}
+  $scope.roomChats = {}
 
   $scope.recentUsers = {}
 
@@ -128,27 +157,35 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
         messages: messages
         typing: false
 
-    $scope.getHistory = (uid, limit, offset) ->
-      rid = btoa(Math.random())
-      removeHandler = $rootScope.$on "socket:get history", (event, history) ->
-        if history.rid == rid
-          removeHandler()
-          if (chat = $scope.chats[uid])
-            (
-              chat.messages[msg.local_id] =
-                body: msg.body
-                from: msg.from
-                to: msg.to
-                read: msg.read
-                timestamp: msg.timestamp
-                id: msg.local_id
-                direction: msg.direction
-            ) for msg in history.messages
+  $scope.getHistory = (uid, limit, offset) ->
+    rid = btoa(Math.random())
+    removeHandler = $rootScope.$on "socket:get history", (event, history) ->
+      if history.rid == rid
+        removeHandler()
+        if (chat = $scope.chats[uid])
+          (
+            chat.messages[msg.local_id] =
+              body: msg.body
+              from: msg.from
+              to: msg.to
+              read: msg.read
+              timestamp: msg.timestamp
+              id: msg.local_id
+              direction: msg.direction
+          ) for msg in history.messages
 
-      $scope.socket.emit "get history",
-        rid: rid
-        with: uid
-        offset: offset
-        limit: limit
+    $scope.socket.emit "get history",
+      rid: rid
+      with: uid
+      offset: offset
+      limit: limit
+
+  $scope.joinRoom = ->
+    if (name = prompt "Room name:")
+      $scope.socket.emit "join room",
+        name: name
+
+  $scope.sendRoomMessage = (msg) ->
+    $scope.socket.emit "room chat", msg
 
   $scope.connect()

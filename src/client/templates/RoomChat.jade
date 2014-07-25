@@ -1,0 +1,16 @@
+ul.chat.list-group(scroll-glue="")
+  li.chat-message.list-group-item(ng-repeat="message in roomChat.messages | orderObjectBy:\"timestamp\"" ng-mouseover="sendMessageReceipt(this.message)" ng-class="{\"pending\": !message.read}")
+    ng-switch(on="message.direction")
+      span(ng-switch-when="in" class="chat-message-in") <<< {{message.from}}:
+      span(ng-switch-when="out" class="chat-message-out") >>> [you]:
+      span &nbsp;
+      span [{{message.timestamp | date: 'dd.MM.yyyy HH:mm:ss Z'}}]
+      span &nbsp;
+      span {{message.body}}
+  li.chat-message.list-group-item(ng-if="chat.typing")
+    i {{roomChat.uid}} is typing...
+form(ng-controller="roomChatFormCtrl")
+  input(type="text" ng-model="text" ng-keydown="sendTyping(true)" ng-keyup="sendTyping(false)")
+  button(ng-click="submit()") Send
+button(ng-click="getHistory(roomChat.uid)") Get history
+

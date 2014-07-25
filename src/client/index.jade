@@ -16,8 +16,11 @@ html(ng-app="app")
     script(type="text/javascript", src="controllers/SocketCtrl.js")
     script(type="text/javascript", src="controllers/ChatCtrl.js")
     script(type="text/javascript", src="controllers/ChatFormCtrl.js")
-    script(type="text/javascript", src="directives/Chat.js")
+    script(type="text/javascript", src="controllers/RoomChatCtrl.js")
+    script(type="text/javascript", src="controllers/RoomChatFormCtrl.js")
     script(type="text/javascript", src="directives/RecentUsers.js")
+    script(type="text/javascript", src="directives/Chat.js")
+    script(type="text/javascript", src="directives/RoomChat.js")
     script(type="text/javascript", src="directives/BootstrapDirectives.js")
     script(type="text/javascript", src="filters/OrderObjectBy.js")
   body(ng-controller="socketCtrl")
@@ -36,8 +39,11 @@ html(ng-app="app")
           tabset
             tab(heading="{{chat.uid}}" ng-repeat="(uid, chat) in chats | unique: 'uid'")
               chat(ng-controller="chatCtrl")
+            tab(heading="{{roomChat.name}}" ng-repeat="(uid, roomChat) in roomChats | unique: 'name'")
+              room-chat(ng-controller="roomChatCtrl")
       div.col-md-4
         recent-users
+        button(ng-click="joinRoom()") Join room
 
     ul
       li(ng-repeat="msg in pendingMessages") {{msg.id}}

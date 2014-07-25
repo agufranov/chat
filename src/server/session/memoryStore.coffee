@@ -3,6 +3,7 @@
 class MemoryStore
   constructor: (io) ->
     uids = {}
+    rooms = {}
 
     getUid = (socket) ->
       socket.handshake.query.uid
@@ -34,15 +35,18 @@ class MemoryStore
         io.emit "users offline", [ uid ]
         console.log "User offline: #{uid}"
 
-    # Выполнить действие для всех сокетов с таким-то uid
-    @do = (uid, fn) ->
-      sockets = (io.sockets.connected[sid] for sid of uids[uid])
-      fn(socket) for socket in sockets
+    # Добавить пользователя в комнату
+    #@addToRoom = (
 
-    # Выполнить действие для всех сокетов с таким-то uid, кроме одного
-    @doExcept = (uid, excludeSid, fn) ->
-      sockets = (io.sockets.connected[sid] for sid of uids[uid] when sid != excludeSid)
-      fn(socket) for socket in sockets
+    ## Выполнить действие для всех сокетов с таким-то uid
+    #@do = (uid, fn) ->
+      #sockets = (io.sockets.connected[sid] for sid of uids[uid])
+      #fn(socket) for socket in sockets
+
+    ## Выполнить действие для всех сокетов с таким-то uid, кроме одного
+    #@doExcept = (uid, excludeSid, fn) ->
+      #sockets = (io.sockets.connected[sid] for sid of uids[uid] when sid != excludeSid)
+      #fn(socket) for socket in sockets
 
     @getUids = ->
       uids

@@ -2,7 +2,7 @@ PostgresProvider = require "./archive/postgresProvider"
 Perfmeter = require "../util/perfmeter"
 
 class Messenger
-  constructor: (sessionStore) ->
+  constructor: (io, sessionStore) ->
     archiveProvider = new PostgresProvider
     getUid = (socket) ->
       socket.handshake.query.uid
@@ -24,18 +24,16 @@ class Messenger
             to: msg.to
             id: msg.id
             timestamp: msg.timestamp
-          sessionStore.doExcept thisUid, socket.id, (socket) ->
-            socket.emit "my chat",
-              to: msg.to
-              body: msg.body
-              id: msg.id
-              timestamp: msg.timestamp
-          sessionStore.do msg.to, (socket) ->
-            socket.emit "chat",
-              from: msg.from
-              body: msg.body
-              id: msg.id
-              timestamp: msg.timestamp
+          socket.broadcast.to(thisUid).emit "my chat",
+            to: msg.to
+            body: msg.body
+            id: msg.id
+            timestamp: msg.timestamp
+          io.to(msg.to).emit "chat",
+            from: msg.from
+            body: msg.body
+            id: msg.id
+            timestamp: msg.timestamp
           pm.stop()
 
       # Отправка подтверждения прочтения
@@ -45,21 +43,18 @@ class Messenger
           if err?
             socket.emit "messaging error", err
           else
-            sessionStore.doExcept thisUid, socket.id, (socket) ->
-              socket.emit "chat receipt",
-                from: msg.to
-                id: msg.id
-            sessionStore.do msg.to, (socket) ->
-              socket.emit "chat receipt",
-                from: msg.from
-                id: msg.id
+            socket.broadcast.to(thisUid).emit "chat receipt",
+              from: msg.to
+              id: msg.id
+            io.to(msg.to).emit "chat receipt",
+              from: msg.from
+              id: msg.id
 
       # Отправка уведомления о наборе текста
       socket.on "chat typing", (chat) ->
-        sessionStore.do chat.uid, (socket) ->
-          socket.emit "chat typing",
-            uid: thisUid
-            typing: chat.typing
+        io.to(chat.uid).emit "chat typing",
+          uid: thisUid
+          typing: chat.typing
 
       # Получение истории
       socket.on "get history", (options) ->
@@ -72,5 +67,22 @@ class Messenger
             socket.emit "get history",
               rid: options.rid
               messages: result.rows
+
+      # Присоединение к комнате
+      socket.on "join room", (options) ->
+        socket.join options.name, ->
+          console.log "Join room:", arguments
+          io.to(thisUid).emit "room joined",
+            rid: options.rid
+            name: options.name
+          socket.broadcast.to(options.name).emit "join room",
+            uid: thisUid
+            room: options.name
+
+      # Отправка сообщения в комнату
+      socket.on "room chat", (msg) ->
+        console.log "Room chat:", msg
+        msg.from = thisUid
+        socket.broadcast.to(msg.to).emit "room chat", msg
 
 module.exports = Messenger

@@ -18,8 +18,12 @@ App.factory "socketSvc", ($rootScope, socketFactory) ->
       "chat timestamp"
       "chat typing"
       "get history"
+      "join room"
+      "room joined"
+      "room chat"
       "users online"
       "users offline"
+      "debug"
     ]
     mySocket
   disconnect: ->
