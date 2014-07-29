@@ -1,5 +1,6 @@
-socketio = require "socket.io"
 http = require "http"
+socketio = require "socket.io"
+socketioredis = require "socket.io-redis"
 
 AuthProvider = require "../auth/authProvider"
 MemoryStore = require "../session/memoryStore"
@@ -8,29 +9,11 @@ Messenger = require "../messaging/messenger"
 
 class Server
   constructor: (port) ->
-
-    # HTTP-сервер для отладки
-    httpHandler = (req, res) ->
-      res.writeHead 200
-      uids = sessionStore.getUids()
-      (
-        res.write "#{uid}: "
-        res.write "#{Object.keys(sids).join(", ")}"
-        res.write "\n"
-      ) for uid, sids of uids
-      res.write "\nRooms:\n"
-      (
-        res.write "#{room}: "
-        res.write members.join(", ")
-        res.write "\n"
-      ) for room, members of io.sockets.adapter.rooms
-      res.write JSON.stringify io.sockets.adapter.rooms
-      res.end()
-    http = http.createServer httpHandler
-    .listen port
-
     # Сервер Socket.IO
-    io = socketio http
+    io = socketio port
+
+    # Адаптер Redis для коммуникации между экземплярами сервера
+    io.adapter socketioredis host: "localhost", port: 6379
 
     # Хранилище сессий
     sessionStore = new MemoryStore(io)
@@ -48,9 +31,11 @@ class Server
     # Подключение сокета
     io.on "connection", (socket) ->
       socket.join getUid socket
-      io.to("t").emit "debug", "RRRRR"
-      socket.broadcast.to("t").emit "debug", "EEEEEEE"
       sessionStore.add socket
+
+      socket.emit "hello", "Server on port #{port}"
+      io.emit "hello", "#{getUid socket} connected to port #{port}"
+      socket.emit "debug port", port
 
       # Отключение сокета
       socket.on "disconnect", ->

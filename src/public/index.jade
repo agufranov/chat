@@ -25,7 +25,10 @@ html(ng-app="app")
     script(type="text/javascript", src="filters/OrderObjectBy.js")
   body(ng-controller="socketCtrl")
     nav.navbar.navbar-default
-      span.navbar-brand(ng-model="$parent.uid") {{$parent.uid}}
+      span.navbar-brand(ng-model="$parent.uid")
+        b {{$parent.uid}}
+        &nbsp;
+        [port {{port}}]
       form.navbar-form.navbar-left
         div.form-group
           input.form-control(type="text" ng-model="$parent.uid" ng-readonly="isConnected")
