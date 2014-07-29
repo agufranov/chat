@@ -8,9 +8,10 @@ Perfmeter = require "../util/perfmeter"
 Messenger = require "../messaging/messenger"
 
 class Server
-  constructor: (port) ->
+  # carrier - express сервер, http сервер или просто порт
+  constructor: (carrier, name) ->
     # Сервер Socket.IO
-    io = socketio port
+    io = socketio carrier
 
     # Адаптер Redis для коммуникации между экземплярами сервера
     io.adapter socketioredis host: "localhost", port: 6379
@@ -33,9 +34,8 @@ class Server
       socket.join getUid socket
       sessionStore.add socket
 
-      socket.emit "hello", "Server on port #{port}"
       io.emit "hello", "#{getUid socket} connected to port #{port}"
-      socket.emit "debug port", port
+      socket.emit "debug server name", name
 
       # Отключение сокета
       socket.on "disconnect", ->
