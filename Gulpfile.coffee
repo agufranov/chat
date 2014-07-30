@@ -58,6 +58,11 @@ gulp.task "nodemon", ->
     ext: "js"
     nodeArgs: [ "--debug" ]
 
+gulp.task "monitor", ->
+  nodemon
+    script: "./build/monitor/monitor.js"
+    ignore: [ "**/*.*" ]
+
 gulp.task "supervisor", ->
   supervisor "./build/server/app.js",
     watch: "./build/server/"

@@ -28,7 +28,7 @@ html(ng-app="app")
       span.navbar-brand(ng-model="$parent.uid")
         b {{$parent.uid}}
         &nbsp;
-        [port {{port}}]
+        [server {{serverName}}]
       form.navbar-form.navbar-left
         div.form-group
           input.form-control(type="text" ng-model="$parent.uid" ng-readonly="isConnected")

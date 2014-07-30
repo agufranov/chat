@@ -1,15 +1,16 @@
 express = require "express"
+livereload = require "express-livereload"
 
 class Server
   constructor: (port, name) ->
     app = express()
+    #livereload(app, config={ port: port + 100 })
 
     app.get "/", (req, res) ->
       res.send name
 
-    console.log "#{__dirname}/public"
     app.use express.static "#{__dirname}/../public"
 
-    app.listen port
+    @server = app.listen port
 
 module.exports = Server

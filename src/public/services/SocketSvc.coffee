@@ -1,9 +1,10 @@
 App.factory "socketSvc", ($rootScope, socketFactory) ->
   mySocket = null
   connect: (uid) ->
+    console.log "Trying to connect..."
     mySocket = socketFactory
-      ioSocket: io.connect "http://127.0.0.1:9000",
-        "force new connection": true
+      ioSocket: io.connect "http://localhost:9000",
+        #"force new connection": true
         query:
           uid: uid
     mySocket.forward [
@@ -25,7 +26,7 @@ App.factory "socketSvc", ($rootScope, socketFactory) ->
       "users offline"
       "debug"
       "hello"
-      "debug port"
+      "debug server name"
     ]
     mySocket
   disconnect: ->

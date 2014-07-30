@@ -129,9 +129,9 @@ App.controller "socketCtrl", ($rootScope, $scope, socketSvc) ->
       $rootScope.$on "socket:hello", (event, msg) ->
         console.log "HELLO: #{msg}"
 
-      $rootScope.$on "socket:debug port", (event, port) ->
-        console.log port
-        $scope.port = port
+      $rootScope.$on "socket:debug server name", (event, name) ->
+        console.log name
+        $scope.serverName = name
 
   $scope.disconnect = ->
     socketSvc.disconnect()
