@@ -4,5 +4,5 @@ ssh user@srv << "ENDSSH"
   git reset --hard origin/master
   git pull origin master
   npm install
-  nodemon
+  gulp server-compile-coffee
 ENDSSH
