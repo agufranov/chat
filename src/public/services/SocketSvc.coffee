@@ -3,7 +3,7 @@ App.factory "socketSvc", ($rootScope, socketFactory) ->
   connect: (uid) ->
     console.log "Trying to connect..."
     mySocket = socketFactory
-      ioSocket: io.connect "http://srv:9000",
+      ioSocket: io.connect "http://srv:20100",
         #"force new connection": true
         query:
           uid: uid
