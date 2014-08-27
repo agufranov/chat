@@ -54,7 +54,7 @@ gulp.task "server-compile-coffee", ->
 gulp.task "server", [ "nodemon" ]
 
 gulp.task "nodemon", ->
-  console.log 
+  console.log argv
   nodemon
     script: "./build/app.js"
     ignore: [ "public/**" ]
