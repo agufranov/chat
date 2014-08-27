@@ -4,5 +4,5 @@ ssh user@srv << "ENDSSH"
   git reset --hard origin/master
   git pull origin master
   npm install
-  node build/app.js
+  nodemon
 ENDSSH
